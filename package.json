@@ -20,6 +20,7 @@
     "directories": {
       "output": "dist"
     },
+    "icon": "assets/icon.png",
     "files": [
       "**/*",
       "!node_modules/**/*",
@@ -51,8 +52,8 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Organizador Financeiro",
       "displayLanguageSelector": true,
-      "installerIcon": null,
-      "uninstallerIcon": null,
+      "installerIcon": "assets/icon.png",
+      "uninstallerIcon": "assets/icon.png",
       "installerHeader": null,
       "installerHeaderIcon": null,
       "deleteAppDataOnUninstall": false,
