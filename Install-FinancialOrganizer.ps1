@@ -65,7 +65,6 @@ Write-Host "[3/4] Creating launch script..." -ForegroundColor Green
 try {
     $startupScript = @"
 @echo off
-title Financial Organizer
 cd /d "$InstallPath"
 
 :: Check if Node.js is installed
@@ -91,15 +90,25 @@ if %ERRORLEVEL% NEQ 0 (
 :: Install electron if not present
 if not exist node_modules (
     echo Installing Electron... Please wait...
-    npm install electron --save-dev --no-audit --no-fund
+    npm install electron --save-dev --no-audit --no-fund >nul 2>nul
 )
 
-:: Run the application
-npx electron .
+:: Run the application and close CMD window
+start /b "" npx electron .
+exit
 "@
     
     $startupScript | Out-File -FilePath "$InstallPath\Financial Organizer.bat" -Encoding ASCII
-    Write-Host "[OK] Launch script created" -ForegroundColor Green
+    
+    # Create silent launcher VBS script
+    $vbsScript = @"
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "$InstallPath\Financial Organizer.bat" & chr(34), 0
+Set WshShell = Nothing
+"@
+    $vbsScript | Out-File -FilePath "$InstallPath\Financial Organizer Silent.vbs" -Encoding ASCII
+    
+    Write-Host "[OK] Launch script created (with silent launcher)" -ForegroundColor Green
 } catch {
     Write-Host "[ERROR] Could not create launch script: $_" -ForegroundColor Red
     exit 1
@@ -107,26 +116,47 @@ npx electron .
 
 # Create shortcuts
 Write-Host "[4/4] Creating shortcuts..." -ForegroundColor Green
+
+# Create desktop shortcut
 try {
-    # Desktop shortcut
-    $WshShell = New-Object -comObject WScript.Shell
-    $DesktopShortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Financial Organizer.lnk")
-    $DesktopShortcut.TargetPath = "$InstallPath\Financial Organizer.bat"
+    $DesktopPath = [System.Environment]::GetFolderPath('Desktop')
+    $WshShell = New-Object -ComObject WScript.Shell
+    $DesktopShortcut = $WshShell.CreateShortcut("$DesktopPath\Financial Organizer.lnk")
+    $DesktopShortcut.TargetPath = "$InstallPath\Financial Organizer Silent.vbs"
     $DesktopShortcut.WorkingDirectory = $InstallPath
     $DesktopShortcut.Description = "Personal Financial Management Application"
+    $DesktopShortcut.IconLocation = "$InstallPath\assets\icon.png,0"
     $DesktopShortcut.Save()
+    Write-Host "[OK] Desktop shortcut created" -ForegroundColor Green
+} catch {
+    Write-Host "[WARNING] Could not create desktop shortcut: $_" -ForegroundColor Yellow
     
-    # Start Menu shortcut
-    $StartMenuPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
+    # Fallback - create simple batch file on desktop
+    try {
+        $FallbackVbs = @"
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "$InstallPath\Financial Organizer.bat" & chr(34), 0
+Set WshShell = Nothing
+"@
+        $FallbackVbs | Out-File -FilePath "$DesktopPath\Financial Organizer.vbs" -Encoding ASCII
+        Write-Host "[OK] Fallback desktop launcher created" -ForegroundColor Green
+    } catch {
+        Write-Host "[ERROR] Could not create any desktop shortcut" -ForegroundColor Red
+    }
+}
+
+# Create Start Menu shortcut
+try {
+    $StartMenuPath = [System.Environment]::GetFolderPath('StartMenu') + "\Programs"
     $StartMenuShortcut = $WshShell.CreateShortcut("$StartMenuPath\Financial Organizer.lnk")
-    $StartMenuShortcut.TargetPath = "$InstallPath\Financial Organizer.bat"
+    $StartMenuShortcut.TargetPath = "$InstallPath\Financial Organizer Silent.vbs"
     $StartMenuShortcut.WorkingDirectory = $InstallPath
     $StartMenuShortcut.Description = "Personal Financial Management Application"
+    $StartMenuShortcut.IconLocation = "$InstallPath\assets\icon.png,0"
     $StartMenuShortcut.Save()
-    
-    Write-Host "[OK] Shortcuts created successfully" -ForegroundColor Green
+    Write-Host "[OK] Start Menu shortcut created" -ForegroundColor Green
 } catch {
-    Write-Host "[WARNING] Could not create shortcuts: $_" -ForegroundColor Yellow
+    Write-Host "[WARNING] Could not create Start Menu shortcut: $_" -ForegroundColor Yellow
 }
 
 Write-Host

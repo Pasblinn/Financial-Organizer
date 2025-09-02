@@ -52,31 +52,60 @@ echo [OK] Files copied
 echo [3/4] Creating launch script...
 echo @echo off > "%INSTALL_DIR%\Financial Organizer.bat"
 echo cd /d "%INSTALL_DIR%" >> "%INSTALL_DIR%\Financial Organizer.bat"
-echo npx electron . >> "%INSTALL_DIR%\Financial Organizer.bat"
+echo start /b "" npx electron . >> "%INSTALL_DIR%\Financial Organizer.bat"
+echo exit >> "%INSTALL_DIR%\Financial Organizer.bat"
+
+:: Create silent launcher VBS script
+echo Set WshShell = CreateObject("WScript.Shell") > "%INSTALL_DIR%\Financial Organizer Silent.vbs"
+echo WshShell.Run chr(34) ^& "%INSTALL_DIR%\Financial Organizer.bat" ^& chr(34), 0 >> "%INSTALL_DIR%\Financial Organizer Silent.vbs"
+echo Set WshShell = Nothing >> "%INSTALL_DIR%\Financial Organizer Silent.vbs"
 
 :: Create desktop shortcut
 echo [4/4] Creating shortcuts...
+echo Creating desktop shortcut...
 echo Set WshShell = WScript.CreateObject("WScript.Shell") > "%TEMP%\shortcut.vbs"
-echo Set Shortcut = WshShell.CreateShortcut("%DESKTOP%\Financial Organizer.lnk") >> "%TEMP%\shortcut.vbs"
-echo Shortcut.TargetPath = "%INSTALL_DIR%\Financial Organizer.bat" >> "%TEMP%\shortcut.vbs"
+echo Set Shortcut = WshShell.CreateShortcut("%USERPROFILE%\Desktop\Financial Organizer.lnk") >> "%TEMP%\shortcut.vbs"
+echo Shortcut.TargetPath = "%INSTALL_DIR%\Financial Organizer Silent.vbs" >> "%TEMP%\shortcut.vbs"
 echo Shortcut.WorkingDirectory = "%INSTALL_DIR%" >> "%TEMP%\shortcut.vbs"
 echo Shortcut.Description = "Personal Financial Organizer" >> "%TEMP%\shortcut.vbs"
+if exist "%INSTALL_DIR%\assets\icon.png" echo Shortcut.IconLocation = "%INSTALL_DIR%\assets\icon.png,0" >> "%TEMP%\shortcut.vbs"
 echo Shortcut.Save >> "%TEMP%\shortcut.vbs"
-cscript "%TEMP%\shortcut.vbs" >nul
-del "%TEMP%\shortcut.vbs"
+
+cscript //nologo "%TEMP%\shortcut.vbs" 2>nul
+if %errorlevel% equ 0 (
+    echo [OK] Desktop shortcut created
+) else (
+    echo [WARNING] Could not create desktop shortcut, creating fallback...
+    :: Create simple VBS file on desktop as fallback
+    echo Set WshShell = CreateObject("WScript.Shell") > "%USERPROFILE%\Desktop\Financial Organizer.vbs"
+    echo WshShell.Run chr(34) ^& "%INSTALL_DIR%\Financial Organizer.bat" ^& chr(34), 0 >> "%USERPROFILE%\Desktop\Financial Organizer.vbs"
+    echo Set WshShell = Nothing >> "%USERPROFILE%\Desktop\Financial Organizer.vbs"
+    echo [OK] Fallback desktop launcher created
+)
+del "%TEMP%\shortcut.vbs" 2>nul
 
 :: Create start menu shortcut  
-if not exist "%START_MENU%" mkdir "%START_MENU%"
+echo Creating start menu shortcut...
+set "START_MENU=%APPDATA%\Microsoft\Windows\Start Menu\Programs"
+if not exist "%START_MENU%" mkdir "%START_MENU%" 2>nul
+
 echo Set WshShell = WScript.CreateObject("WScript.Shell") > "%TEMP%\startmenu.vbs"
 echo Set Shortcut = WshShell.CreateShortcut("%START_MENU%\Financial Organizer.lnk") >> "%TEMP%\startmenu.vbs"
-echo Shortcut.TargetPath = "%INSTALL_DIR%\Financial Organizer.bat" >> "%TEMP%\startmenu.vbs"
+echo Shortcut.TargetPath = "%INSTALL_DIR%\Financial Organizer Silent.vbs" >> "%TEMP%\startmenu.vbs"
 echo Shortcut.WorkingDirectory = "%INSTALL_DIR%" >> "%TEMP%\startmenu.vbs"
 echo Shortcut.Description = "Personal Financial Organizer" >> "%TEMP%\startmenu.vbs"
+if exist "%INSTALL_DIR%\assets\icon.png" echo Shortcut.IconLocation = "%INSTALL_DIR%\assets\icon.png,0" >> "%TEMP%\startmenu.vbs"
 echo Shortcut.Save >> "%TEMP%\startmenu.vbs"
-cscript "%TEMP%\startmenu.vbs" >nul
-del "%TEMP%\startmenu.vbs"
 
-echo [OK] Shortcuts created
+cscript //nologo "%TEMP%\startmenu.vbs" 2>nul
+if %errorlevel% equ 0 (
+    echo [OK] Start Menu shortcut created
+) else (
+    echo [WARNING] Could not create Start Menu shortcut
+)
+del "%TEMP%\startmenu.vbs" 2>nul
+
+echo [OK] Shortcut creation completed
 echo.
 echo ================================================
 echo          Installation Complete!
