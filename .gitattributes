@@ -1,0 +1,4 @@
+softwarefinanceiro/**
+git[[:space:]]lfs[[:space:]]track[[:space:]]softwarefinanceiro/** filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+dist/**/*.exe filter=lfs diff=lfs merge=lfs -text

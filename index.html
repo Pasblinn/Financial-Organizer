@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador Financeiro</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-top">
+                <h1>💰 Organizador Financeiro</h1>
+                <div class="header-controls">
+                    <button id="themeToggle" class="theme-toggle" title="Alternar tema">🌙</button>
+                    <button id="exportBtn" class="export-btn" title="Exportar dados">📥</button>
+                </div>
+            </div>
+            <div class="mes-navegacao">
+                <button id="mesAnterior">&lt;</button>
+                <h2 id="mesAtual">Janeiro 2024</h2>
+                <button id="mesProximo">&gt;</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="resumo">📊 Resumo</button>
+            <button class="tab" data-tab="graficos">📈 Gráficos</button>
+            <button class="tab" data-tab="entradas">💰 Entradas</button>
+            <button class="tab" data-tab="gastos">💳 Gastos</button>
+            <button class="tab" data-tab="reserva">🏦 Reserva Emergência</button>
+        </div>
+
+        <div id="resumo" class="tab-content active">
+            <div class="cards-resumo">
+                <div class="card entrada">
+                    <div class="card-icon">💰</div>
+                    <div class="card-content">
+                        <h3>Entradas do Mês</h3>
+                        <span class="valor" id="totalEntradas">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="card saida">
+                    <div class="card-icon">💳</div>
+                    <div class="card-content">
+                        <h3>Saídas do Mês</h3>
+                        <span class="valor" id="totalSaidas">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="card saldo">
+                    <div class="card-icon">💵</div>
+                    <div class="card-content">
+                        <h3>Saldo Final</h3>
+                        <span class="valor" id="saldoFinal">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="card reserva">
+                    <div class="card-icon">🏦</div>
+                    <div class="card-content">
+                        <h3>Reserva de Emergência</h3>
+                        <span class="valor" id="totalReserva">R$ 0,00</span>
+                        <div class="meta">Meta: <span id="metaReserva">R$ 0,00</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resumo-charts">
+                <div class="chart-container">
+                    <h4>Evolução dos Últimos 6 Meses</h4>
+                    <canvas id="chartEvolucao" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="graficos" class="tab-content">
+            <div class="graficos-grid">
+                <div class="grafico-card">
+                    <h4>Gastos por Categoria</h4>
+                    <canvas id="chartCategorias" width="300" height="300"></canvas>
+                </div>
+                <div class="grafico-card">
+                    <h4>Tipos de Entrada</h4>
+                    <canvas id="chartEntradas" width="300" height="300"></canvas>
+                </div>
+                <div class="grafico-card">
+                    <h4>Gastos Essenciais vs Não Essenciais</h4>
+                    <canvas id="chartEssencial" width="300" height="300"></canvas>
+                </div>
+                <div class="grafico-card">
+                    <h4>Formas de Pagamento</h4>
+                    <canvas id="chartPagamento" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="entradas" class="tab-content">
+            <div class="secao-header">
+                <h3>Entradas do Mês</h3>
+                <button id="addEntrada" class="btn-add">+ Adicionar Entrada</button>
+            </div>
+            <div class="lista" id="listaEntradas"></div>
+        </div>
+
+        <div id="gastos" class="tab-content">
+            <div class="secao-header">
+                <h3>Gastos do Mês</h3>
+                <button id="addGasto" class="btn-add">+ Adicionar Gasto</button>
+            </div>
+            <div class="lista" id="listaGastos"></div>
+        </div>
+
+        <div id="reserva" class="tab-content">
+            <div class="reserva-config">
+                <h3>Configuração da Reserva de Emergência</h3>
+                <div class="form-group">
+                    <label for="metaReservaInput">Meta de Reserva (R$):</label>
+                    <input type="text" id="metaReservaInput" placeholder="10000,00" inputmode="decimal">
+                </div>
+                <button id="salvarMeta" class="btn-primary">Salvar Meta</button>
+                
+                <div class="progress-reserva">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressoAtual">0%</span> da meta atingida
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar entrada -->
+    <div id="modalEntrada" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Adicionar Entrada</h3>
+            <form id="formEntrada">
+                <div class="form-group">
+                    <label for="tipoEntrada">Tipo:</label>
+                    <select id="tipoEntrada" required>
+                        <option value="">Selecione</option>
+                        <option value="salario">Salário</option>
+                        <option value="ganhos-fora">Ganhos por Fora</option>
+                        <option value="juros-recebidos">Juros Recebidos</option>
+                        <option value="emprestado">Emprestado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="valorEntrada">Valor (R$):</label>
+                    <input type="text" id="valorEntrada" placeholder="0,00" inputmode="decimal" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricaoEntrada">Descrição:</label>
+                    <input type="text" id="descricaoEntrada">
+                </div>
+                <button type="submit" class="btn-primary">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar gasto -->
+    <div id="modalGasto" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Adicionar Gasto</h3>
+            <form id="formGasto">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="especificacaoGasto">Especificação:</label>
+                        <select id="especificacaoGasto" required>
+                            <option value="">Selecione</option>
+                            <option value="gasto-fixo">Gasto Fixo</option>
+                            <option value="gasto-variavel">Gasto Variável</option>
+                            <option value="investimento">Investimento</option>
+                            <option value="poupanca">Poupança</option>
+                            <option value="reserva-emergencia">Reserva de Emergência</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="diaGasto">Dia:</label>
+                        <input type="text" id="diaGasto" placeholder="1-31" maxlength="2" inputmode="numeric" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipoGasto">Tipo:</label>
+                        <select id="tipoGasto" required>
+                            <option value="">Selecione</option>
+                            <option value="essencial">Essencial</option>
+                            <option value="nao-essencial">Não Essencial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoCompra">Tipo de Compra:</label>
+                        <select id="tipoCompra" required>
+                            <option value="">Selecione</option>
+                            <option value="pix">PIX/Dinheiro</option>
+                            <option value="debito">Débito</option>
+                            <option value="credito">Crédito</option>
+                            <option value="investimento">Investimento</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoriaGasto">Categoria:</label>
+                    <select id="categoriaGasto" required>
+                        <option value="">Selecione</option>
+                        <option value="academia">Academia</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="uber">Uber</option>
+                        <option value="mercado">Mercado</option>
+                        <option value="parcela">Parcela</option>
+                        <option value="contas">Contas</option>
+                        <option value="assinatura">Assinatura</option>
+                        <option value="vestuario">Vestuário e Acessórios</option>
+                        <option value="restaurante">Restaurante</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="fatura">Fatura</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="valorGasto">Valor (R$):</label>
+                        <input type="text" id="valorGasto" placeholder="0,00" inputmode="decimal" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label for="pagoGasto">
+                            <input type="checkbox" id="pagoGasto">
+                            Pago
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricaoGasto">Descrição:</label>
+                    <input type="text" id="descricaoGasto">
+                </div>
+
+                <button type="submit" class="btn-primary">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

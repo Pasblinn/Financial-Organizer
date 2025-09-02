@@ -1,0 +1,84 @@
+{
+  "name": "organizador-financeiro",
+  "version": "1.0.0",
+  "description": "Software desktop para organização de finanças pessoais",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win --publish=never",
+    "build-win-portable": "electron-builder --win portable --publish=never",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "dist": "electron-builder --publish=never"
+  },
+  "build": {
+    "appId": "com.organizadorfinanceiro.app",
+    "productName": "Organizador Financeiro",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!src/**/*",
+      "!.git/**/*",
+      "!dist/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "sign": false,
+      "verifyUpdateCodeSignature": false,
+      "signAndEditExecutable": false,
+      "signDlls": false,
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Organizador Financeiro",
+      "displayLanguageSelector": true,
+      "installerIcon": null,
+      "uninstallerIcon": null,
+      "installerHeader": null,
+      "installerHeaderIcon": null,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "menuCategory": "Office",
+      "license": null,
+      "warningsAsErrors": false
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "keywords": ["finanças", "organização", "controle financeiro", "desktop"],
+  "author": "Pablo",
+  "license": "MIT",
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}
