@@ -65,7 +65,7 @@
     }
   },
   "keywords": ["finanças", "organização", "controle financeiro", "desktop"],
-  "author": "Pablo",
+  "author": "Pablo Tadini <pablosotomaior@live.com>",
   "license": "MIT",
   "dependencies": {
     "chart.js": "^4.4.0"
