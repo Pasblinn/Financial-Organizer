@@ -1,0 +1,77 @@
+{
+  "name": "organizador-financeiro",
+  "version": "1.1.0",
+  "description": "Software desktop para organização de finanças pessoais",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win --publish=never",
+    "clean": "rimraf dist node_modules/.cache"
+  },
+  "build": {
+    "appId": "com.organizadorfinanceiro.app",
+    "productName": "Organizador Financeiro",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "compression": "store",
+    "nodeGypRebuild": false,
+    "buildDependenciesFromSource": false,
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!src/**/*",
+      "!.git/**/*",
+      "!dist/**/*",
+      "!*.md",
+      "!*.txt",
+      "!.gitignore",
+      "!.DS_Store",
+      "!Thumbs.db"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable", 
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "sign": false,
+      "rfc3161TimeStampServer": "",
+      "timeStampServer": ""
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "artifactName": "${productName}-Instalador.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable.${ext}"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "keywords": ["finanças", "organização", "controle financeiro", "desktop"],
+  "author": "Pablo",
+  "license": "MIT",
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}
