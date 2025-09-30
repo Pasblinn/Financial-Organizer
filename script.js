@@ -153,7 +153,6 @@ class FinanceApp {
         const descricao = document.getElementById('descricaoEntrada').value || '';
         
         if (isNaN(valor) || valor <= 0) {
-            alert('Por favor, insira um valor válido (ex: 1500,00)');
             return;
         }
 
@@ -192,12 +191,10 @@ class FinanceApp {
         const descricao = document.getElementById('descricaoGasto').value || '';
         
         if (isNaN(dia) || dia < 1 || dia > 31) {
-            alert('Por favor, insira um dia válido (1-31)');
             return;
         }
         
         if (isNaN(valor) || valor <= 0) {
-            alert('Por favor, insira um valor válido (ex: 250,50)');
             return;
         }
 
@@ -924,7 +921,7 @@ class FinanceApp {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        alert('Dados exportados com sucesso!');
+        // Dados exportados com sucesso
     }
 
     programarGastoExistente(chave, gastoId) {
@@ -963,13 +960,8 @@ class FinanceApp {
             });
 
             this.salvarDados();
-            
-            const meses = [
-                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-            ];
-            
-            alert(`Gasto programado para ${meses[proximoMes]} ${proximoAno} com sucesso!`);
+
+            // Gasto programado com sucesso
         }
     }
 }

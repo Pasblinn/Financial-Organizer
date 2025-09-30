@@ -1,4 +1,4 @@
-# Contributing to Financial Organizer
+'# Contributing to Financial Organizer
 
 Thank you for considering contributing to Financial Organizer! This document outlines the process for contributing code, documentation, and ideas to this project.
 
